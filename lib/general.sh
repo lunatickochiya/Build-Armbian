@@ -983,7 +983,8 @@ download_and_verify()
 			if [[ "${filename:(-6)}" == "tar.xz" ]]; then
 
 				display_alert "decompressing"
-				pv -p -b -r -c -N "[ .... ] ${filename}" $filename | xz -dc | tar xp --xattrs --no-same-owner --overwrite
+				echo "[ .... ] ${filename}"
+				xz -dc $filename | tar xp --xattrs --no-same-owner --overwrite
 				[[ $? -eq 0 ]] && touch ${localdir}/$dirname/.download-complete
 			fi
 		else
