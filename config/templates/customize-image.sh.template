@@ -245,7 +245,7 @@ InstallAdvancedDesktop()
 
 FixPhicommN1BluetoothFirmware()
 {
-	if [[ -f "/lib/firmware/brcm/BCM4345C0.hcd" ]] then
+	if [[ -f "/lib/firmware/brcm/BCM4345C0.hcd" ]] ; then
 		return
 	fi
 
