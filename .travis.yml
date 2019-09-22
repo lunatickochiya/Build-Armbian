@@ -59,7 +59,7 @@ after_success:
 before_deploy:
 - cd "$HOME/imgs"
 - find "$TRAVIS_BUILD_DIR/output/" -name *.img -exec sudo mv {} "$HOME/imgs" \;
-- sudo xz -z *.img && xz -l *.xz
+- sudo xz -v -z *.img && xz -l *.xz
 deploy:
   provider: releases
   file_glob: true
