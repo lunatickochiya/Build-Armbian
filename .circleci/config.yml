@@ -1,0 +1,70 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/armbian
+    # Can't build on docker
+    # Wait for CircleCi machine 18.04
+    docker:
+      - image: ubuntu:bionic
+    environment:
+      RELEASE: "buster"
+      BUILD_DESKTOP: "no"
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            apt update && DEBIAN_FRONTEND=noninteractive apt install -y gnupg1 gpgv1 --no-install-recommends
+
+            if [ x"" != x$http_proxy ]; then
+              apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
+            else
+              apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
+            fi
+
+            echo "deb http://repo.aptly.info/ nightly main" > /etc/apt/sources.list.d/aptly.list
+            dpkg --add-architecture i386
+
+            apt update && DEBIAN_FRONTEND=noninteractive apt -y upgrade && \
+              DEBIAN_FRONTEND=noninteractive apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
+              pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
+              qemu-user-static u-boot-tools uuid-dev zlib1g-dev unzip libusb-1.0-0-dev parted pkg-config libncurses5-dev whiptail \
+              debian-keyring debian-archive-keyring f2fs-tools libfile-fcntllock-perl rsync libssl-dev nfs-kernel-server btrfs-tools \
+              ncurses-term p7zip-full kmod dosfstools libc6-dev-armhf-cross fakeroot xxd \
+              curl patchutils python liblz4-tool libpython2.7-dev linux-base swig libpython-dev \
+              systemd-container udev g++-5-arm-linux-gnueabihf lib32stdc++6 cpio tzdata psmisc acl \
+              libc6-i386 lib32ncurses5 lib32tinfo5 locales ncurses-base zlib1g:i386 pixz bison libbison-dev flex libfl-dev \
+              pigz aptly aria2 cryptsetup cryptsetup-bin --no-install-recommends
+
+            locale-gen en_US.UTF-8
+            export LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8" TERM="${TERM:-dumb}"
+      - checkout
+      - run:
+          name: Prepare for build
+          command: |
+            # CircleCI sets the following in Git config at clone time:
+            #   url.ssh://git@github.com.insteadOf https://github.com
+            # this break our builds
+            rm -f ~/.gitconfig
+            touch .ignore_changes
+
+            version="$(cat VERSION)"
+            echo "Current Armbian version is $version"
+
+            echo "${version}-${RELEASE}" > "ARMBIAN_BUILD"
+      - restore_cache:
+          key: armbian-cache-{{ checksum "ARMBIAN_BUILD" }}
+      - run:
+          name: Build image
+          command: |
+            ./compile.sh BOARD=aml-g12 BRANCH=default RELEASE=$RELEASE BUILD_MINIMAL=no \
+              BUILD_DESKTOP=$BUILD_DESKTOP KERNEL_ONLY=no KERNEL_CONFIGURE=no
+      - save_cache:
+          key: armbian-cache-{{ checksum "ARMBIAN_BUILD" }}
+          paths:
+            - ~/armbian/cache
+      - run: rm -rf ~/armbian/cache
+workflows:
+  version: 2
+  build-workflow:
+    jobs:
+      - build
