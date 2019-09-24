@@ -1,0 +1,73 @@
+dist: bionic
+sudo: true
+notifications:
+  email: false
+language: minimal
+cache:
+  bundler: true
+git:
+  depth: 1
+  submodules: false
+branches:
+  only:
+  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+env:
+  global:
+  - GITHUB_USER=kuoruan
+  - GITHUB_REPO=Build-Armbian
+  - TERM=dumb
+  matrix:
+  - RELEASE=disco BUILD_DESKTOP=no
+  - RELEASE=bionic BUILD_DESKTOP=no
+  - RELEASE=buster BUILD_DESKTOP=no
+before_install:
+  - sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y gnupg1 gpgv1 --no-install-recommends
+  - |
+    if [ x"" != x$http_proxy ]; then
+      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
+    else
+      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
+    fi
+  - echo "deb http://repo.aptly.info/ nightly main" | sudo tee /etc/apt/sources.list.d/aptly.list
+  - sudo dpkg --add-architecture i386
+install:
+  - |
+    sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt -y upgrade && \
+      DEBIAN_FRONTEND=noninteractive sudo apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
+      pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
+      qemu-user-static u-boot-tools uuid-dev zlib1g-dev unzip libusb-1.0-0-dev parted pkg-config libncurses5-dev whiptail \
+      debian-keyring debian-archive-keyring f2fs-tools libfile-fcntllock-perl rsync libssl-dev nfs-kernel-server btrfs-tools \
+      ncurses-term p7zip-full kmod dosfstools libc6-dev-armhf-cross fakeroot xxd \
+      curl patchutils python liblz4-tool libpython2.7-dev linux-base swig libpython-dev \
+      systemd-container udev g++-5-arm-linux-gnueabihf lib32stdc++6 cpio tzdata psmisc acl \
+      libc6-i386 lib32ncurses5 lib32tinfo5 locales ncurses-base zlib1g:i386 pixz bison libbison-dev flex libfl-dev \
+      pigz aptly aria2 cryptsetup cryptsetup-bin --no-install-recommends
+  - sudo locale-gen en_US.UTF-8
+  - export LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8" TERM="${TERM:-dumb}"
+before_script:
+- df -h
+- free -mh
+- mkdir "$HOME/imgs"
+script:
+- cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
+- |
+  ./compile.sh BOARD=aml-g12 BRANCH=default RELEASE=$RELEASE BUILD_MINIMAL=no BUILD_DESKTOP=$BUILD_DESKTOP \
+    KERNEL_ONLY=no KERNEL_CONFIGURE=no
+after_success:
+- df -h
+- free -mh
+- cd "$TRAVIS_BUILD_DIR" && ls -alh
+- find "$TRAVIS_BUILD_DIR/output/"
+before_deploy:
+- cd "$HOME/imgs"
+- find "$TRAVIS_BUILD_DIR/output/" -name *.img -exec sudo mv {} "$HOME/imgs" \;
+- sudo xz -v -z *.img && xz -l *.xz
+deploy:
+  provider: releases
+  file_glob: true
+  file: "$HOME/imgs/*.xz"
+  skip_cleanup: true
+  on:
+    tags: true
+  api_key:
+    secure: m9UobKUTdl3NaPlnQvwpIomaZuyEd2bVUvZi4q07JOtsQEElXor+Ze+J8oI/Sj5ommxq6o/OsaWaB5q1HZWc7QJlZdHDRYVJ/b0e/qdN9k6cqNsbz/7U90B45Gf6TjX4RLbI59fuOxIldSp3BgX2aFAHpt/gcV9raFrBemPqs+qQMm+8vMvIx5sM5EaUgnveWrZLaOLXVwMKyeJh9Ro1i8pbCxhV3AAD1smODvsJEMVLs7LWUfQPDKbQ8hR+jwCcubAivL0y0tCqgq7Ic1Yscje6AH3hGpgBTme57NZIgiE2cwSs3xX9WHzMjio5P44aXyDnj3rmoH+uPl0GJ//Ui6tY6Q5mPN6WcJrciBQQDBJqFCRFp7ITXT1vE1rm8S3cYyGPwxdHaKNxRy0o58jlyDoPbGsfjjy/CkuTcY3rzJLUo5I1UnH784zm/+/Fue9HznZoKzNyeBtQycEAGP02roWblw+z0MaytGykN7pr7xLVgvRWofBNU2gMqHDRRg9HvDIo238RkSOS5iapz8Ormm21N8Up92ffRbyG77MPYMkyQXvV8WBiKNWD5UaHk3fz1W3VjRPMXEC3f/Q8/RDxCNqk3V39NmF4zmT/5me6TqqBAjdoavejdYYPeTjHv4M9tNIzB12hoYeCMPUx4hPMRr/DaGkLl6eyLmX5hUc5rrE=
