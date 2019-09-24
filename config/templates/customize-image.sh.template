@@ -37,7 +37,7 @@ Main() {
 			;;
 	esac
 
-	FixPhicommN1BluetoothFirmware
+	FixPhicommN1Firmware
 } # Main
 
 InstallOpenMediaVault() {
@@ -243,17 +243,40 @@ InstallAdvancedDesktop()
 	apt clean
 } # InstallAdvancedDesktop
 
-FixPhicommN1BluetoothFirmware()
+FixPhicommN1Firmware()
 {
-	if [[ -f "/lib/firmware/brcm/BCM4345C0.hcd" ]] ; then
-		return
+	if [[ ! -s "/lib/firmware/brcm/BCM4345C0.hcd" ]] ; then
+		if [[ -f "/lib/firmware/BCM4345C0.hcd" ]] ; then
+			ln -sf "../BCM4345C0.hcd" "/lib/firmware/brcm/BCM4345C0.hcd"
+		else
+			wget -O "/lib/firmware/brcm/BCM4345C0.hcd" \
+				https://github.com/RPi-Distro/bluez-firmware/raw/master/broadcom/BCM4345C0.hcd
+		fi
 	fi
 
-	if [ -f "/lib/firmware/BCM4345C0.hcd" ] ; then
-		ln -sf "../BCM4345C0.hcd" "/lib/firmware/brcm/BCM4345C0.hcd"
-	else
-		wget -q -O "/lib/firmware/brcm/BCM4345C0.hcd" https://github.com/RPi-Distro/bluez-firmware/raw/master/broadcom/BCM4345C0.hcd
+	if [[ ! -s "/lib/firmware/brcm/brcmfmac43455-sdio.bin" ]] ; then
+		wget -O "/lib/firmware/brcm/brcmfmac43455-sdio.bin" \
+			https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.bin
 	fi
-} # FixPhicommN1BluetoothFirmware
+
+	if [[ ! -s "/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob" ]] ; then
+		wget -O "/lib/firmware/brcm/brcmfmac43455-sdio.clm_blob" \
+			https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.clm_blob
+	fi
+
+	if [[ ! -s "/lib/firmware/brcm/brcmfmac43455-sdio.txt" ]] ; then
+		wget -O "/lib/firmware/brcm/brcmfmac43455-sdio.txt" \
+			https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.txt
+	fi
+
+	if [[ ! -s "/lib/firmware/brcm/brcmfmac43455-sdio.phicomm,n1.txt" ]] ; then
+		if [[ -L "/lib/firmware/brcm/brcmfmac43455-sdio.txt" ]] ; then
+			wget -O "/lib/firmware/brcm/brcmfmac43455-sdio.phicomm,n1.txt" \
+				https://github.com/RPi-Distro/firmware-nonfree/raw/master/brcm/brcmfmac43455-sdio.txt
+		else
+			cp "/lib/firmware/brcm/brcmfmac43455-sdio.txt" "/lib/firmware/brcm/brcmfmac43455-sdio.phicomm,n1.txt"
+		fi
+	fi
+} # FixPhicommN1Firmware
 
 Main "$@"
