@@ -1,7 +1,7 @@
 # Armbian #
 
 Debian based Linux for ARM based single-board computers
-  
+
 [https://www.armbian.com](https://www.armbian.com "Armbian")
 
 
@@ -18,10 +18,12 @@ Supported build environment is **Ubuntu Bionic 18.04 x64** ([minimal iso image](
 
 **Execution**
 
-	apt-get -y install git
-	git clone https://github.com/150balbes/Build-Armbian
-	cd build
-	./compile.sh
+```sh
+apt-get -y install git
+git clone https://github.com/kuoruan/Build-Armbian
+cd build
+./compile.sh
+```
 
 Make sure that full path to the build script does not contain spaces.
 
