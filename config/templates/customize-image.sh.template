@@ -38,6 +38,8 @@ Main() {
 	esac
 
 	FixPhicommN1Firmware
+
+	RandomWlanMACAddress
 } # Main
 
 InstallOpenMediaVault() {
@@ -278,5 +280,29 @@ FixPhicommN1Firmware()
 		fi
 	fi
 } # FixPhicommN1Firmware
+
+RandomWlanMACAddress()
+{
+	# 2c:15:e1	Phicomm (shanghai) Co., Ltd.
+	# 2c:b2:1a	Phicomm (shanghai) Co., Ltd.
+	# 68:db:54	Phicomm (shanghai) Co., Ltd.
+	# 74:7d:24	Phicomm (shanghai) Co., Ltd.
+	# 98:bb:99	Phicomm (sichuan) Co.,ltd.
+	# cc:81:da	Phicomm (shanghai) Co., Ltd.
+	# d8:c8:e9	Phicomm (shanghai) Co., Ltd.
+	# fc:7c:02	Phicomm (shanghai) Co., Ltd.
+
+	RANDOM_MAC="$(printf 'cc:81:da:%02x:%02x:%02x\n' $[RANDOM%256] $[RANDOM%256] $[RANDOM%256])"
+
+	if [[ -f "/lib/firmware/brcm/brcmfmac43455-sdio.phicomm,n1.txt" ]] ; then
+		sed -i -e "s/^macaddr=b8:27:eb:74:f2:6c$/macaddr=$RANDOM_MAC/" \
+			"/lib/firmware/brcm/brcmfmac43455-sdio.phicomm,n1.txt"
+	fi
+
+	if [[ -f "/lib/firmware/brcm/brcmfmac43455-sdio.txt" ]] ; then
+		sed -i -e "s/^macaddr=b8:27:eb:74:f2:6c$/macaddr=$RANDOM_MAC/" \
+			"/lib/firmware/brcm/brcmfmac43455-sdio.txt"
+	fi
+} # RandomWlanMACAddress
 
 Main "$@"
