@@ -20,22 +20,26 @@ jobs:
           - GITHUB_USER=kuoruan
           - GITHUB_REPO=Build-Armbian
           - TERM=dumb
-      script:
+      install:
         - sudo apt install -y lrzsz
         - echo "Prepare environment"
+        - touch test_files
     - stage: Show infomation
-      script:
+      before_script:
         - df -h
         - free -mh
         - mkdir "$HOME/imgs"
         - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
+        - echo "$GITHUB_USER/$GITHUB_REPO"
     - stage: Build Image
       env:
-        - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
-        - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=no
+        matrix:
+          - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
+          - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=no
       script:
         - echo "Build"
         - rz --version
+        - lsi -al
     - stage: Compress Image
       script: echo "Compress"
     - stage: Deploy
