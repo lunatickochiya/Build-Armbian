@@ -17,9 +17,15 @@ env:
   - GITHUB_REPO=Build-Armbian
   - TERM=dumb
   matrix:
-  - RELEASE=disco BUILD_DESKTOP=no
-  - RELEASE=bionic BUILD_DESKTOP=no
-  - RELEASE=buster BUILD_DESKTOP=no
+  - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=no
+  - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=yes
+  - RELEASE=disco BUILD_DESKTOP=yes BUILD_MINIMAL=no
+  - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
+  - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=yes
+  - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=yes
+  - RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=no
+  - RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=yes
+  - RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
 before_install:
   - sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y gnupg1 gpgv1 --no-install-recommends
   - |
