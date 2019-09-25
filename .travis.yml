@@ -5,6 +5,8 @@ notifications:
 language: minimal
 cache:
   bundler: true
+  directories:
+    - "$IMAGE_DIR"
 git:
   depth: 1
   submodules: false
@@ -16,6 +18,7 @@ env:
   global:
     - GITHUB_USER=kuoruan
     - GITHUB_REPO=Build-Armbian
+    - IMAGE_DIR="${HOME}/images/${TRAVIS_BUILD_NUMBER}"
     - TERM=dumb
 
 install:
@@ -25,7 +28,7 @@ install:
 before_script:
   - df -h
   - free -mh
-  - mkdir "$HOME/imgs"
+  - mkdir -p "$IMAGE_DIR"
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
   - echo "$GITHUB_USER/$GITHUB_REPO"
 
@@ -37,22 +40,25 @@ jobs:
       script:
         - echo "Build"
         - rz --version
-        - echo > "${RELEASE}_${BUILD_DESKTOP}"
+      after_success:
+        - echo "All Success"
+        - ls -al
+        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
     - stage: Build Image
       env:
         - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
       script:
         - echo "Build"
         - rz --version
-        - echo > "${RELEASE}_${BUILD_DESKTOP}"
+      after_success:
+        - echo "All Success"
+        - ls -al
+        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
     - stage: Compress Image
       script:
-        - echo "Compress"
+        - echo "Compress ${IMAGE_DIR}"
+        - ls -al "$IMAGE_DIR"
         - ls -al
-
-after_success:
-  - echo "All Success"
-  - ls -al
 
 deploy:
   provider: releases
