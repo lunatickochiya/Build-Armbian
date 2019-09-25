@@ -18,6 +18,7 @@ env:
   global:
     - GITHUB_USER=kuoruan
     - GITHUB_REPO=Build-Armbian
+    - CACHE_NAME="Armbian-images"
     - IMAGE_DIR="${HOME}/images"
     - TERM=dumb
 
@@ -34,8 +35,6 @@ before_script:
 
 jobs:
   include:
-    - stage: prepare cache
-      script: true
     - stage: build
       env:
         - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
