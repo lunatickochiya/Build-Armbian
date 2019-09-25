@@ -12,6 +12,12 @@ git:
 #   only:
 #   - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 
+stages:
+  - Prepare environment
+  - Show infomation
+  - Build Image
+  - Deploy
+
 jobs:
   include:
     - stage: Prepare environment
