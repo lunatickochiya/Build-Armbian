@@ -12,27 +12,30 @@ git:
 #   only:
 #   - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 env:
-  global:
   - GITHUB_USER=kuoruan
   - GITHUB_REPO=Build-Armbian
   - TERM=dumb
-  matrix:
-  - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=no
-  - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
-before_install:
-  - echo "Before install"
-install:
-  - echo "Install"
-before_script:
-- df -h
-- free -mh
-- mkdir "$HOME/imgs"
-- cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
+
 
 jobs:
   include:
+    - stage: Prepare environment
+      script:
+        - sudo apt install -y lrzsz
+        - echo "Prepare environment"
+    - stage: Show infomation
+      script:
+        - df -h
+        - free -mh
+        - mkdir "$HOME/imgs"
+        - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
     - stage: Build Image
-      script: echo "Build"
+      env:
+        - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
+        - RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=no
+      script:
+        - echo "Build"
+        - rz --version
     - stage: Compress Image
       script: echo "Compress"
     - stage: Deploy
