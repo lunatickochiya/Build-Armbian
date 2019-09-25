@@ -23,7 +23,7 @@ env:
 
 install:
   - echo "Prepare environment"
-  - sudo apt install -y lrzsz xz
+  - sudo apt install -y lrzsz xz-utils
 
 before_script:
   - df -h
@@ -58,6 +58,7 @@ jobs:
     - stage: Compress Image
       script:
         - echo "Compress ${IMAGE_DIR}"
+        - ls -al "${HOME}/images"
         - cd "$IMAGE_DIR"
         - ls -al "$IMAGE_DIR"
         - xz -v -z *
