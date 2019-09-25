@@ -23,7 +23,7 @@ env:
 
 install:
   - echo "Prepare environment"
-  - sudo apt install -y lrzsz
+  - sudo apt install -y lrzsz xz
 
 before_script:
   - df -h
@@ -40,25 +40,28 @@ jobs:
       script:
         - echo "Build"
         - rz --version
+        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
+        - ls -al "$IMAGE_DIR"
       after_success:
         - echo "All Success"
-        - ls -al
-        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
+        - ls -al "$IMAGE_DIR"
     - stage: Build Image
       env:
         - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
       script:
         - echo "Build"
         - rz --version
+        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
       after_success:
         - echo "All Success"
-        - ls -al
-        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
+        - ls -al "$IMAGE_DIR"
     - stage: Compress Image
       script:
         - echo "Compress ${IMAGE_DIR}"
+        - cd "$IMAGE_DIR"
         - ls -al "$IMAGE_DIR"
-        - ls -al
+        - xz -v -z *
+        - ls -al "$IMAGE_DIR"
 
 deploy:
   provider: releases
