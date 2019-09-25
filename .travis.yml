@@ -11,15 +11,15 @@ git:
 # branches:
 #   only:
 #   - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-env:
-  - GITHUB_USER=kuoruan
-  - GITHUB_REPO=Build-Armbian
-  - TERM=dumb
-
 
 jobs:
   include:
     - stage: Prepare environment
+      env:
+        global:
+          - GITHUB_USER=kuoruan
+          - GITHUB_REPO=Build-Armbian
+          - TERM=dumb
       script:
         - sudo apt install -y lrzsz
         - echo "Prepare environment"
