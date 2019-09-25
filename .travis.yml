@@ -4,6 +4,7 @@ notifications:
   email: false
 language: minimal
 cache:
+  ccache: true
   bundler: true
 git:
   depth: 1
@@ -27,7 +28,8 @@ env:
   - RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=yes
   - RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
 before_install:
-  - sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y gnupg1 gpgv1 --no-install-recommends
+  - sudo apt update
+  - sudo apt install -y gnupg1 gpgv1 --no-install-recommends
   - |
     if [ x"" != x$http_proxy ]; then
       sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
@@ -38,8 +40,9 @@ before_install:
   - sudo dpkg --add-architecture i386
 install:
   - |
-    sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt -y upgrade && \
-      DEBIAN_FRONTEND=noninteractive sudo apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
+    sudo apt update
+    sudo apt -y upgrade
+    sudo apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
       pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
       qemu-user-static u-boot-tools uuid-dev zlib1g-dev unzip libusb-1.0-0-dev parted pkg-config libncurses5-dev whiptail \
       debian-keyring debian-archive-keyring f2fs-tools libfile-fcntllock-perl rsync libssl-dev nfs-kernel-server btrfs-tools \
@@ -48,8 +51,6 @@ install:
       systemd-container udev g++-5-arm-linux-gnueabihf lib32stdc++6 cpio tzdata psmisc acl \
       libc6-i386 lib32ncurses5 lib32tinfo5 locales ncurses-base zlib1g:i386 pixz bison libbison-dev flex libfl-dev \
       pigz aptly aria2 cryptsetup cryptsetup-bin --no-install-recommends
-  - sudo locale-gen en_US.UTF-8
-  - export LANG="en_US.UTF-8" LANGUAGE="en_US:en" LC_ALL="en_US.UTF-8" TERM="${TERM:-dumb}"
 before_script:
 - df -h
 - free -mh
@@ -57,7 +58,7 @@ before_script:
 script:
 - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
 - |
-  ./compile.sh BOARD=aml-g12 BRANCH=default RELEASE=$RELEASE BUILD_MINIMAL=no BUILD_DESKTOP=$BUILD_DESKTOP \
+  ./compile.sh BOARD=aml-g12 BRANCH=default RELEASE=$RELEASE BUILD_MINIMAL=$BUILD_MINIMAL BUILD_DESKTOP=$BUILD_DESKTOP \
     KERNEL_ONLY=no KERNEL_CONFIGURE=no
 after_success:
 - df -h
