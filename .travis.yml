@@ -19,9 +19,8 @@ env:
     - TERM=dumb
 
 install:
-  - sudo apt install -y lrzsz
   - echo "Prepare environment"
-  - touch test_files
+  - sudo apt install -y lrzsz
 
 before_script:
   - df -h
@@ -38,16 +37,21 @@ jobs:
       script:
         - echo "Build"
         - rz --version
-        - echo > "$RELEASE_$BUILD_DESKTOP"
+        - echo > "${RELEASE}_${BUILD_DESKTOP}"
     - stage: Build Image
       env:
         - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
       script:
         - echo "Build"
         - rz --version
-        - echo > "$RELEASE_$BUILD_DESKTOP"
+        - echo > "${RELEASE}_${BUILD_DESKTOP}"
+    - stage: Compress Image
+        script:
+          - echo "Compress"
+          - ls -al
 
 after_success:
+  - echo "All Success"
   - ls -al
 
 deploy:
