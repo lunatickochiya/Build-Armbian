@@ -18,17 +18,17 @@ env:
   global:
     - GITHUB_USER=kuoruan
     - GITHUB_REPO=Build-Armbian
-    - IMAGE_DIR="${HOME}/images/${TRAVIS_BUILD_NUMBER}"
+    - IMAGE_DIR="${HOME}/images"
     - TERM=dumb
 
 install:
   - echo "Prepare environment"
-  - sudo apt install -y lrzsz xz-utils
+  - sudo apt install -y xz-utils
 
 before_script:
   - df -h
   - free -mh
-  - mkdir -p "$IMAGE_DIR"
+  - mkdir -p "${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}"
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
   - echo "$GITHUB_USER/$GITHUB_REPO"
 
@@ -39,30 +39,26 @@ jobs:
         - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
       script:
         - echo "Build"
-        - rz --version
-        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
-        - ls -al "$IMAGE_DIR"
+        - echo "$(date)" >"${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}/${RELEASE}_${BUILD_DESKTOP}"
       after_success:
         - echo "All Success"
-        - ls -al "$IMAGE_DIR"
+        - find "$IMAGE_DIR"
     - stage: Build Image
       env:
         - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
       script:
         - echo "Build"
-        - rz --version
-        - echo > "${IMAGE_DIR}/${RELEASE}_${BUILD_DESKTOP}"
+        - echo "$(date)" >"${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}/${RELEASE}_${BUILD_DESKTOP}"
       after_success:
         - echo "All Success"
-        - ls -al "$IMAGE_DIR"
+        - find "$IMAGE_DIR"
     - stage: Compress Image
       script:
         - echo "Compress ${IMAGE_DIR}"
-        - ls -al "${HOME}/images"
-        - cd "$IMAGE_DIR"
-        - ls -al "$IMAGE_DIR"
-        - xz -v -z *
-        - ls -al "$IMAGE_DIR"
+        - find "$IMAGE_DIR"
+        - cd "$IMAGE_DIR/${TRAVIS_BUILD_NUMBER}"
+        - test -n "$(ls)" && xz -v -z * || true
+        - ls -al
 
 deploy:
   provider: releases
