@@ -46,9 +46,9 @@ jobs:
         - rz --version
         - echo > "${RELEASE}_${BUILD_DESKTOP}"
     - stage: Compress Image
-        script:
-          - echo "Compress"
-          - ls -al
+      script:
+        - echo "Compress"
+        - ls -al
 
 after_success:
   - echo "All Success"
