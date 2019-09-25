@@ -34,7 +34,9 @@ before_script:
 
 jobs:
   include:
-    - stage: Build Image
+    - stage: prepare cache
+      script: true
+    - stage: build
       env:
         - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
       script:
@@ -43,7 +45,7 @@ jobs:
       after_success:
         - echo "All Success"
         - find "$IMAGE_DIR"
-    - stage: Build Image
+    - stage: build
       env:
         - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
       script:
@@ -52,7 +54,7 @@ jobs:
       after_success:
         - echo "All Success"
         - find "$IMAGE_DIR"
-    - stage: Compress Image
+    - stage: compress
       script:
         - echo "Compress ${IMAGE_DIR}"
         - find "$IMAGE_DIR"
