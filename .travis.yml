@@ -4,8 +4,8 @@ notifications:
   email: false
 language: minimal
 cache:
-  ccache: true
-  bundler: true
+  directories:
+  - "$HOME/.ccache"
 git:
   depth: 1
   submodules: false
@@ -23,25 +23,20 @@ env:
   - RELEASE=disco BUILD_DESKTOP=yes BUILD_MINIMAL=no
   - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
   - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=yes
-  - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=yes
+  - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
   - RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=no
   - RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=yes
   - RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
 before_install:
   - sudo apt update
   - sudo apt install -y gnupg1 gpgv1 --no-install-recommends
-  - |
-    if [ x"" != x$http_proxy ]; then
-      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
-    else
-      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED75B5A4483DA07C >/dev/null 2>&1
-    fi
+  - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys ED75B5A4483DA07C
   - echo "deb http://repo.aptly.info/ nightly main" | sudo tee /etc/apt/sources.list.d/aptly.list
   - sudo dpkg --add-architecture i386
 install:
+  - sudo apt update
+  - sudo apt -y upgrade
   - |
-    sudo apt update
-    sudo apt -y upgrade
     sudo apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
       pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
       qemu-user-static u-boot-tools uuid-dev zlib1g-dev unzip libusb-1.0-0-dev parted pkg-config libncurses5-dev whiptail \
@@ -54,7 +49,7 @@ install:
 before_script:
 - df -h
 - free -mh
-- mkdir "$HOME/imgs"
+- ccache -s
 script:
 - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
 - |
@@ -63,10 +58,11 @@ script:
 after_success:
 - df -h
 - free -mh
-- cd "$TRAVIS_BUILD_DIR" && ls -alh
-- find "$TRAVIS_BUILD_DIR/output/"
+- cd "$TRAVIS_BUILD_DIR"
+- ls -alh
+- find "output/"
 before_deploy:
-- cd "$HOME/imgs"
+- mkdir "$HOME/imgs" && cd "$HOME/imgs"
 - find "$TRAVIS_BUILD_DIR/output/" -name *.img -exec sudo mv {} "$HOME/imgs" \;
 - sudo xz -v -z *.img && xz -l *.xz
 deploy:
