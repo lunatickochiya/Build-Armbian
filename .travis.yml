@@ -4,8 +4,11 @@ notifications:
   email: false
 language: minimal
 cache:
-  directories:
-    - "$HOME/.ccache"
+  - ccache
+addons:
+  apt:
+    packages:
+     - ccache
 git:
   depth: 1
   submodules: false
@@ -38,7 +41,7 @@ install:
   - sudo apt -y upgrade
   - |
     sudo apt install -y git dialog lsb-release binutils wget ca-certificates device-tree-compiler \
-      pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
+      pv bc lzop zip binfmt-support build-essential debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
       qemu-user-static u-boot-tools uuid-dev zlib1g-dev unzip libusb-1.0-0-dev parted pkg-config libncurses5-dev whiptail \
       debian-keyring debian-archive-keyring f2fs-tools libfile-fcntllock-perl rsync libssl-dev nfs-kernel-server btrfs-tools \
       ncurses-term p7zip-full kmod dosfstools libc6-dev-armhf-cross fakeroot xxd \
@@ -49,7 +52,6 @@ install:
 before_script:
   - df -h
   - free -mh
-  - ccache -s
 script:
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
   - |
