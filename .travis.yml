@@ -20,13 +20,19 @@ matrix:
     - if: tag IS present
       env: RELEASE=disco BUILD_DESKTOP=no BUILD_MINIMAL=yes
     - if: tag IS present
+      env: RELEASE=disco BUILD_DESKTOP=yes BUILD_MINIMAL=no
+    - if: tag IS present
       env: RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
     - if: tag IS present
       env: RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=yes
     - if: tag IS present
+      env: RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
+    - if: tag IS present
       env: RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=no
     - if: tag IS present
       env: RELEASE=buster BUILD_DESKTOP=no BUILD_MINIMAL=yes
+    - if: tag IS present
+      env: RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
 before_install:
   - sudo apt update
   - sudo apt install -y gnupg1 gpgv1 --no-install-recommends
