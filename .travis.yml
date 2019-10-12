@@ -2,11 +2,10 @@ dist: bionic
 sudo: true
 notifications:
   email: false
-language: minimal
+language: c
 cache:
   bundler: true
-  directories:
-    - "$IMAGE_DIR"
+  ccache: true
 git:
   depth: 1
   submodules: false
@@ -18,48 +17,24 @@ env:
   global:
     - GITHUB_USER=kuoruan
     - GITHUB_REPO=Build-Armbian
-    - CACHE_NAME="Armbian-images"
-    - IMAGE_DIR="${HOME}/images"
     - TERM=dumb
 
 install:
   - echo "Prepare environment"
-  - sudo apt install -y xz-utils
+  - sudo apt update
+  - sudo apt install -y xz-utils ccache
+  - sudo apt upgrade -y
 
 before_script:
   - df -h
   - free -mh
-  - mkdir -p "${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}"
+  - ccache -version
+  - ccache --show-config
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
-  - echo "$GITHUB_USER/$GITHUB_REPO"
 
-jobs:
-  include:
-    - stage: build
-      env:
-        - RELEASE=bionic BUILD_DESKTOP=no BUILD_MINIMAL=no
-      script:
-        - echo "Build"
-        - echo "$(date)" >"${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}/${RELEASE}_${BUILD_DESKTOP}"
-      after_success:
-        - echo "All Success"
-        - find "$IMAGE_DIR"
-    - stage: build
-      env:
-        - RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
-      script:
-        - echo "Build"
-        - echo "$(date)" >"${IMAGE_DIR}/${TRAVIS_BUILD_NUMBER}/${RELEASE}_${BUILD_DESKTOP}"
-      after_success:
-        - echo "All Success"
-        - find "$IMAGE_DIR"
-    - stage: compress
-      script:
-        - echo "Compress ${IMAGE_DIR}"
-        - find "$IMAGE_DIR"
-        - cd "$IMAGE_DIR/${TRAVIS_BUILD_NUMBER}"
-        - test -n "$(ls)" && xz -v -z * || true
-        - ls -al
+script:
+  - true
+  - ccache -s
 
 deploy:
   provider: releases
