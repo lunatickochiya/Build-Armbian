@@ -28,7 +28,7 @@ install:
 before_script:
   - df -h
   - free -mh
-  - ccache -version
+  - ccache --version
   - ccache --show-config
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
 
