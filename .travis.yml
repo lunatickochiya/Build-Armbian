@@ -19,17 +19,11 @@ env:
     - GITHUB_REPO=Build-Armbian
     - TERM=dumb
 
-install:
-  - echo "Prepare environment"
-  - sudo apt update
-  - sudo apt install -y xz-utils ccache
-  - sudo apt upgrade -y
-
 before_script:
   - df -h
   - free -mh
-  - ccache --version
-  - ccache --show-config
+  - ccache -V
+  - ccache -p
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
 
 script:
