@@ -1,9 +1,8 @@
 dist: bionic
 sudo: true
-language: minimal
+language: c
 cache:
-  directories:
-    - $HOME/.ccache
+  ccache: true
 git:
   depth: 1
   submodules: false
@@ -35,7 +34,6 @@ before_install:
   - sudo dpkg --add-architecture i386
 install:
   - sudo apt update
-  - sudo apt -y upgrade
   - |
     sudo apt install -y dialog lsb-release binutils ca-certificates device-tree-compiler \
       pv bc lzop zip binfmt-support build-essential ccache debootstrap ntpdate gawk gcc-arm-linux-gnueabihf \
@@ -46,9 +44,11 @@ install:
       systemd-container udev g++-5-arm-linux-gnueabihf lib32stdc++6 cpio tzdata psmisc acl \
       libc6-i386 lib32ncurses5 lib32tinfo5 locales ncurses-base zlib1g:i386 pixz bison libbison-dev flex libfl-dev \
       pigz aptly aria2 cryptsetup cryptsetup-bin apt-cacher-ng --no-install-recommends
+  - sudo apt -y upgrade
 before_script:
   - df -h
   - free -mh
+  - sudo ccache -M 5.0G
 script:
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
   - |
