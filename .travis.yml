@@ -29,6 +29,8 @@ before_script:
 script:
   - true
   - ccache -s
+  - cat "$HOME/.ccache/ccache.conf"
+  - cat "/etc/ccache.conf"
 
 deploy:
   provider: releases
