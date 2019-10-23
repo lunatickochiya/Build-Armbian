@@ -27,6 +27,10 @@ matrix:
     - env: RELEASE=disco BUILD_DESKTOP=yes BUILD_MINIMAL=no
     - env: RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
     - env: RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
+  allow_failures:
+    - env: RELEASE=disco BUILD_DESKTOP=yes BUILD_MINIMAL=no
+    - env: RELEASE=bionic BUILD_DESKTOP=yes BUILD_MINIMAL=no
+    - env: RELEASE=buster BUILD_DESKTOP=yes BUILD_MINIMAL=no
 before_install:
   - sudo apt update
   - sudo apt install -y gnupg1 gpgv1 --no-install-recommends
