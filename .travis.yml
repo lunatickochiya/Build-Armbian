@@ -55,7 +55,7 @@ before_script:
   - sudo ccache -M 5.0G
   - |
     if [ -z "$TRAVIS_TAG" ] ; then
-      export KERNEL_ONLY="yes"
+      export KERNEL_ONLY="yes" PROGRESS_DISPLAY="none"
     else
       export KERNEL_ONLY="no"
     fi
@@ -63,7 +63,7 @@ script:
   - cd "$TRAVIS_BUILD_DIR" && touch .ignore_changes
   - |
     ./compile.sh BOARD=aml-g12 BRANCH=default RELEASE=$RELEASE BUILD_MINIMAL=$BUILD_MINIMAL BUILD_DESKTOP=$BUILD_DESKTOP \
-      KERNEL_ONLY=$KERNEL_ONLY KERNEL_CONFIGURE=no
+      KERNEL_ONLY=$KERNEL_ONLY KERNEL_CONFIGURE=no PROGRESS_DISPLAY=$PROGRESS_DISPLAY
 after_success:
   - df -h
   - free -mh
