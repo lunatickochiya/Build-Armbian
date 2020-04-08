@@ -1,5 +1,5 @@
+os: linux
 dist: bionic
-sudo: true
 language: c
 compiler: gcc
 cache:
@@ -11,8 +11,6 @@ notifications:
   email: false
 env:
   global:
-    - GITHUB_USER=kuoruan
-    - GITHUB_REPO=Build-Armbian
     - TERM=dumb
 matrix:
   include:
@@ -79,8 +77,8 @@ deploy:
   provider: releases
   file_glob: true
   file: "$HOME/imgs/*.xz"
-  skip_cleanup: true
+  cleanup: false
+  edge: true
+  token: $GITHUB_TOKEN
   on:
     tags: true
-  api_key:
-    secure: m9UobKUTdl3NaPlnQvwpIomaZuyEd2bVUvZi4q07JOtsQEElXor+Ze+J8oI/Sj5ommxq6o/OsaWaB5q1HZWc7QJlZdHDRYVJ/b0e/qdN9k6cqNsbz/7U90B45Gf6TjX4RLbI59fuOxIldSp3BgX2aFAHpt/gcV9raFrBemPqs+qQMm+8vMvIx5sM5EaUgnveWrZLaOLXVwMKyeJh9Ro1i8pbCxhV3AAD1smODvsJEMVLs7LWUfQPDKbQ8hR+jwCcubAivL0y0tCqgq7Ic1Yscje6AH3hGpgBTme57NZIgiE2cwSs3xX9WHzMjio5P44aXyDnj3rmoH+uPl0GJ//Ui6tY6Q5mPN6WcJrciBQQDBJqFCRFp7ITXT1vE1rm8S3cYyGPwxdHaKNxRy0o58jlyDoPbGsfjjy/CkuTcY3rzJLUo5I1UnH784zm/+/Fue9HznZoKzNyeBtQycEAGP02roWblw+z0MaytGykN7pr7xLVgvRWofBNU2gMqHDRRg9HvDIo238RkSOS5iapz8Ormm21N8Up92ffRbyG77MPYMkyQXvV8WBiKNWD5UaHk3fz1W3VjRPMXEC3f/Q8/RDxCNqk3V39NmF4zmT/5me6TqqBAjdoavejdYYPeTjHv4M9tNIzB12hoYeCMPUx4hPMRr/DaGkLl6eyLmX5hUc5rrE=
